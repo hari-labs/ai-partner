@@ -9,4 +9,12 @@ def summarize_text(text):
             "stream": False
         }
     )
-    return response.json()["response"]
+    
+    data = response.json()
+    
+    # safe handling
+    if "response" in data:
+        return data["response"]
+    else:
+        print("Summary error:", data)
+        return "Summary not available."

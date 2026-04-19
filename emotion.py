@@ -26,14 +26,17 @@ def detect_excitement(text):
 def detect_frustration(text):
     text = text.lower()
     
-    frustration_signals = ["not working", "still", "again", "why", "error", "issue", "😤", "ugh"]
+    frustration_signals = [
+        "not working",
+        "error",
+        "issue",
+        "stuck",
+        "failed"
+    ]
     
     for signal in frustration_signals:
         if signal in text:
             return True
-            
-    if text.count("!") >= 2:
-        return True
         
     return False
 
