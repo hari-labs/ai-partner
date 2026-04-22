@@ -1,5 +1,5 @@
 import requests
-from memory import save_memory, load_memory
+from memory import save_memory, load_memory, store_facts
 from emotion import detect_uncertainty, detect_excitement, detect_frustration, detect_confusion
 from summary import summarize_text
 from retrieval import extract_keywords, search_memory, is_fact_statement
@@ -33,14 +33,20 @@ prompt_for_facts = """
 Extract ONLY personal facts from the text.
 
 Return STRICT JSON format:
-{
+{{
   "key": "value"
-}
+}}
 
 Rules:
 - No explanation
 - No extra text
-- Only JSON
+- Return ONLY valid JSON.
+- If no facts, return {}.
+- Do not leave JSON incomplete.
+- Do not include explanations.
+- Return JSON with meaningful keys.
+- Avoid generic keys like "name".
+- Use context (e.g., "her_name", "project_name").
 
 Text:
 {user_input}"""
@@ -51,9 +57,9 @@ while True:
     user_input = input("You: ")
 
     if is_fact_statement(user_input):
-        prompt_for_facts = prompt_for_facts.format(user_input=user_input)
-        facts_response = chat_with_ollama(prompt_for_facts)
-        print("Extracted facts:", facts_response)
+        prompt_for_facts_formatted = prompt_for_facts.replace("{user_input}", user_input)
+        facts_response = chat_with_ollama(prompt_for_facts_formatted)
+        store_facts(facts_response)
 
     if detect_frustration(user_input):
         user_input += "\nNote: User seems frustrated. Respond calmly and help clearly."
